@@ -30,3 +30,18 @@ class SimulationConfig:
 class Config:
     simulation: SimulationConfig
     farms: List[FarmConfig]
+
+
+@dataclass
+class WeatherSnapshot:
+    air_temperature: float
+    humidity: float
+    pressure: float
+    wind_speed: float
+    wind_direction: str
+    rain_detected: bool
+    rain_intensity: float
+    light_lux: float
+    uv_index: float
+    source: str = "live"
+
