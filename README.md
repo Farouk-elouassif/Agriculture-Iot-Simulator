@@ -25,3 +25,32 @@ Realistic but simple IoT farm data generator in Python.
    ```bash
    python main.py --config simulator_config.yaml
    ```
+
+## Run Modes
+
+- Stream to stdout (default):
+
+   ```bash
+   python main.py --config simulator_config.yaml --sink stdout
+   ```
+
+- Write newline-delimited JSON to spool file:
+
+   ```bash
+   python main.py --config simulator_config.yaml --sink file --spool-dir ./spool
+   ```
+
+## Realism Logic
+
+- Weather is fetched by farm coordinates from Open-Meteo.
+- If weather API fails, cached weather or fallback values are used.
+- Soil moisture reacts to heat, wind, irrigation, and rain.
+- Irrigation toggles automatically using moisture thresholds and rain conditions.
+- Device battery and signal drift gradually over time.
+
+## Tests
+
+```bash
+python -m unittest discover -s tests -p "test_*.py"
+```
+
