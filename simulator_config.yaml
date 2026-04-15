@@ -1,0 +1,21 @@
+simulation:
+  event_interval_seconds: 5
+  weather_refresh_minutes: 15
+  seed: 42
+  sink: stdout
+
+farms:
+  - id: FARM_01
+    name: Delta Farm
+    lat: 30.0444
+    lon: 31.2357
+    areas:
+      - id: A1
+        crop: tomato
+        devices:
+          - DEV_001
+          - DEV_002
+      - id: A2
+        crop: orange
+        devices:
+          - DEV_003
