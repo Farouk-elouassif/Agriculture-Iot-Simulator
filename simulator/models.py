@@ -6,6 +6,8 @@ from typing import List
 class AreaConfig:
     id: str
     crop: str
+    area_size_km2: float
+    sensor_count: int
     devices: List[str]
 
 

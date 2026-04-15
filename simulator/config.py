@@ -8,14 +8,39 @@ import yaml
 from simulator.models import AreaConfig, Config, FarmConfig, SimulationConfig
 
 
-def _parse_areas(raw_areas: List[Dict[str, Any]]) -> List[AreaConfig]:
+def _generate_device_ids(farm_id: str, area_id: str, sensor_count: int) -> List[str]:
+    return [f"{farm_id}_{area_id}_DEV_{idx:03d}" for idx in range(1, sensor_count + 1)]
+
+
+def _parse_areas(farm_id: str, raw_areas: List[Dict[str, Any]]) -> List[AreaConfig]:
     areas: List[AreaConfig] = []
     for area in raw_areas:
+        area_id = str(area["id"])
+        area_size_km2 = float(area.get("area_size_km2", 1.0))
+        if area_size_km2 <= 0:
+            raise ValueError(f"Area '{area_id}' in farm '{farm_id}' must have area_size_km2 > 0")
+
+        devices = [str(device_id) for device_id in area.get("devices", [])]
+        sensor_count = int(area.get("sensor_count", len(devices) if devices else 1))
+        if sensor_count <= 0:
+            raise ValueError(f"Area '{area_id}' in farm '{farm_id}' must have sensor_count > 0")
+
+        if devices and len(devices) != sensor_count:
+            raise ValueError(
+                f"Area '{area_id}' in farm '{farm_id}' has sensor_count={sensor_count} "
+                f"but devices list has {len(devices)} entries"
+            )
+
+        if not devices:
+            devices = _generate_device_ids(farm_id=farm_id, area_id=area_id, sensor_count=sensor_count)
+
         areas.append(
             AreaConfig(
-                id=str(area["id"]),
+                id=area_id,
                 crop=str(area["crop"]).lower(),
-                devices=[str(device_id) for device_id in area.get("devices", [])],
+                area_size_km2=area_size_km2,
+                sensor_count=sensor_count,
+                devices=devices,
             )
         )
     return areas
@@ -45,7 +70,7 @@ def load_config(config_path: str) -> Config:
                 name=str(farm.get("name", farm["id"])),
                 lat=float(farm["lat"]),
                 lon=float(farm["lon"]),
-                areas=_parse_areas(farm.get("areas", [])),
+                areas=_parse_areas(str(farm["id"]), farm.get("areas", [])),
             )
         )
 

@@ -8,7 +8,7 @@ class PayloadBuilderTests(unittest.TestCase):
     def test_payload_contains_required_sections(self):
         builder = SensorPayloadBuilder()
         farm = FarmConfig(id="F1", name="Farm", lat=30.0, lon=31.0, areas=[])
-        area = AreaConfig(id="A1", crop="tomato", devices=["D1"])
+        area = AreaConfig(id="A1", crop="tomato", area_size_km2=15.0, sensor_count=1, devices=["D1"])
         weather = WeatherSnapshot(
             air_temperature=26.0,
             humidity=60.0,

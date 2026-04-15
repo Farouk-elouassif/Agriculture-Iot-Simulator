@@ -12,10 +12,14 @@ farms:
     areas:
       - id: A1
         crop: tomato
+        area_size_km2: 15
+        sensor_count: 2
         devices:
           - DEV_001
           - DEV_002
       - id: A2
         crop: orange
+        area_size_km2: 15
+        sensor_count: 1
         devices:
           - DEV_003
