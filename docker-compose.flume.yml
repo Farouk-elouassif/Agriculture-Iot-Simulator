@@ -1,0 +1,11 @@
+services:
+  flume:
+    build:
+      context: .
+      dockerfile: docker/flume/Dockerfile
+    container_name: agri-flume
+    volumes:
+      - ./docker/flume/sim-taildir.conf:/opt/flume/conf/sim-taildir.conf:ro
+      - ./spool:/data/spool
+      - ./spool/flume-state:/data/flume
+    restart: unless-stopped

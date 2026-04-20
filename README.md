@@ -180,8 +180,79 @@ Each device emits one JSON event per cycle. Core sections:
 Recommended ingestion patterns:
 
 - Start with `stdout` sink for local validation.
-- Use `file` sink (`events.jsonl`) with Flume spooldir source in integration setups.
+- Use `file` sink (`events.jsonl`) with Flume **taildir** source in integration setups.
 - Keep one event per line for reliable parsing and downstream replay.
+
+### Run Flume with Docker (Recommended)
+
+If you prefer not to install Flume locally, run it in Docker.
+
+1. Start the simulator in file mode (terminal 1):
+
+   ```bash
+   python main.py --config simulator_config.yaml --sink file --spool-dir ./spool
+   ```
+
+2. Build and run Flume container (terminal 2):
+
+   ```bash
+   docker compose -f docker-compose.flume.yml up --build
+   ```
+
+3. Confirm events are flowing (terminal 3):
+
+   ```bash
+   docker compose -f docker-compose.flume.yml logs -f flume
+   ```
+
+   - Flume logs should show `Event:` lines through the `logger` sink.
+   - Input file is `./spool/events.jsonl`.
+
+4. Stop Flume:
+
+   ```bash
+   docker compose -f docker-compose.flume.yml down
+   ```
+
+Notes:
+
+- This project appends to one file, so `taildir` is correct; `spooldir` is designed for completed/rotated files.
+- Flume state is persisted at `./spool/flume-state`.
+
+### Reset and Free Storage
+
+If you want to start from zero and keep local storage small, run:
+
+1. Stop everything:
+
+   ```bash
+   docker compose -f docker-compose.flume.yml down
+   pkill -f "python main.py" || true
+   ```
+
+2. Delete generated simulator and Flume state files:
+
+   ```bash
+   rm -f ./spool/events.jsonl
+   rm -f ./spool/flume-state/taildir_position.json
+   mkdir -p ./spool/flume-state
+   ```
+
+3. Optional Docker cleanup:
+
+   ```bash
+   docker builder prune -f
+   docker image prune -f
+   docker container prune -f
+   ```
+
+4. Start again:
+
+   ```bash
+   python main.py --config simulator_config.yaml --sink file --spool-dir ./spool
+   docker compose -f docker-compose.flume.yml up --build
+   docker compose -f docker-compose.flume.yml logs -f flume
+   ```
 
 ## Multi-Tenant Recommendation
 
